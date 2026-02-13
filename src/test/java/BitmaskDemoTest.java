@@ -6,59 +6,62 @@ import java.util.EnumSet;
 import org.junit.jupiter.api.Test;
 
 class BitmaskDemoTest {
-    // Each constant is a single bit; combinations are OR'ed together.
-    enum SoldierType {
-        NONE(0),
-        PRIVATE(1),
-        CORPORAL(2),
-        SERGEANT(4),
-        LIEUTENANT(8),
-        MAJOR(16),
-        GENERAL(32);
+    @Test
+    void orAddsFlags() {
+        int soldiers = 0;
 
-        final int mask;
+        soldiers = soldiers | SoldierType.MAJOR.mask;
+        soldiers = soldiers | SoldierType.GENERAL.mask;
 
-        SoldierType(int mask) {
-            this.mask = mask;
-        }
+        assertEquals("110000", toBinary(soldiers));
+        assertEquals(EnumSet.of(SoldierType.MAJOR, SoldierType.GENERAL), toSet(soldiers));
     }
 
     @Test
-    void bitwiseOperationsDemo() {
-        int soldiers = 0;
+    void andChecksFlag() {
+        int soldiers = SoldierType.MAJOR.mask | SoldierType.GENERAL.mask;
 
-        // OR: add flags
-        soldiers = soldiers | SoldierType.MAJOR.mask;
-        soldiers = soldiers | SoldierType.GENERAL.mask;
-        assertEquals("110000", toBinary(soldiers));
-
-        // AND: check flag
         boolean hasGeneral = (soldiers & SoldierType.GENERAL.mask) != 0;
+        boolean hasPrivate = (soldiers & SoldierType.PRIVATE.mask) != 0;
+
         assertTrue(hasGeneral);
+        assertFalse(hasPrivate);
+    }
 
-        // XOR: toggle flag
-        soldiers = soldiers ^ SoldierType.MAJOR.mask; // remove Major
+    @Test
+    void xorTogglesFlag() {
+        int soldiers = SoldierType.MAJOR.mask | SoldierType.GENERAL.mask;
+
+        soldiers = soldiers ^ SoldierType.MAJOR.mask;
+
         assertEquals("100000", toBinary(soldiers));
+        assertEquals(EnumSet.of(SoldierType.GENERAL), toSet(soldiers));
+    }
 
-        // NOT: flip bits (mask to keep only known flags)
+    @Test
+    void notFlipsWithinKnownFlags() {
         int allFlags = SoldierType.PRIVATE.mask | SoldierType.CORPORAL.mask | SoldierType.SERGEANT.mask
                 | SoldierType.LIEUTENANT.mask | SoldierType.MAJOR.mask | SoldierType.GENERAL.mask;
         int notMajor = (~SoldierType.MAJOR.mask) & allFlags;
+
         assertFalse((notMajor & SoldierType.MAJOR.mask) != 0);
         assertTrue((notMajor & SoldierType.PRIVATE.mask) != 0);
+    }
 
-        // Right shift: divide by 2
+    @Test
+    void rightShiftDividesByTwo() {
         int sergeant = SoldierType.SERGEANT.mask; // 4
         int rightShift = sergeant >> 1; // 2 -> CORPORAL
+
         assertEquals(SoldierType.CORPORAL.mask, rightShift);
+    }
 
-        // Left shift: multiply by 2
+    @Test
+    void leftShiftMultipliesByTwo() {
+        int sergeant = SoldierType.SERGEANT.mask; // 4
         int leftShift = sergeant << 1; // 8 -> LIEUTENANT
-        assertEquals(SoldierType.LIEUTENANT.mask, leftShift);
 
-        // Show which SoldierType flags are in a mask
-        EnumSet<SoldierType> active = toSet(soldiers);
-        assertEquals(EnumSet.of(SoldierType.GENERAL), active);
+        assertEquals(SoldierType.LIEUTENANT.mask, leftShift);
     }
 
     private static String toBinary(int value) {
