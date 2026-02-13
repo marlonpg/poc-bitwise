@@ -13,6 +13,8 @@ class BitmaskDemoTest {
         soldiers = soldiers | SoldierType.MAJOR.mask;
         soldiers = soldiers | SoldierType.GENERAL.mask;
 
+        System.out.println("OR add flags: Major + General -> " + toBinary(soldiers));
+
         assertEquals("110000", toBinary(soldiers));
         assertEquals(EnumSet.of(SoldierType.MAJOR, SoldierType.GENERAL), toSet(soldiers));
     }
@@ -24,6 +26,9 @@ class BitmaskDemoTest {
         boolean hasGeneral = (soldiers & SoldierType.GENERAL.mask) != 0;
         boolean hasPrivate = (soldiers & SoldierType.PRIVATE.mask) != 0;
 
+        System.out.println("AND check: mask=" + toBinary(soldiers)
+                + " hasGeneral=" + hasGeneral + " hasPrivate=" + hasPrivate);
+
         assertTrue(hasGeneral);
         assertFalse(hasPrivate);
     }
@@ -33,6 +38,8 @@ class BitmaskDemoTest {
         int soldiers = SoldierType.MAJOR.mask | SoldierType.GENERAL.mask;
 
         soldiers = soldiers ^ SoldierType.MAJOR.mask;
+
+        System.out.println("XOR toggle Major: " + toBinary(soldiers));
 
         assertEquals("100000", toBinary(soldiers));
         assertEquals(EnumSet.of(SoldierType.GENERAL), toSet(soldiers));
@@ -44,6 +51,9 @@ class BitmaskDemoTest {
                 | SoldierType.LIEUTENANT.mask | SoldierType.MAJOR.mask | SoldierType.GENERAL.mask;
         int notMajor = (~SoldierType.MAJOR.mask) & allFlags;
 
+        System.out.println("NOT within flags: all=" + toBinary(allFlags)
+            + " notMajor=" + toBinary(notMajor));
+
         assertFalse((notMajor & SoldierType.MAJOR.mask) != 0);
         assertTrue((notMajor & SoldierType.PRIVATE.mask) != 0);
     }
@@ -53,6 +63,8 @@ class BitmaskDemoTest {
         int sergeant = SoldierType.SERGEANT.mask; // 4
         int rightShift = sergeant >> 1; // 2 -> CORPORAL
 
+        System.out.println("Right shift: " + toBinary(sergeant) + " >> 1 = " + toBinary(rightShift));
+
         assertEquals(SoldierType.CORPORAL.mask, rightShift);
     }
 
@@ -60,6 +72,8 @@ class BitmaskDemoTest {
     void leftShiftMultipliesByTwo() {
         int sergeant = SoldierType.SERGEANT.mask; // 4
         int leftShift = sergeant << 1; // 8 -> LIEUTENANT
+
+        System.out.println("Left shift: " + toBinary(sergeant) + " << 1 = " + toBinary(leftShift));
 
         assertEquals(SoldierType.LIEUTENANT.mask, leftShift);
     }
